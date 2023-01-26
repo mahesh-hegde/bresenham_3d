@@ -12,6 +12,7 @@ public class CursorController : MonoBehaviour
     public int movementSpeed = 10;
     public GameObject pixelPrefab;
     public GameObject cursorPositionDisplay;
+    public GameObject drawingStatusDisplay;
     private Vector3 begin, end;
 
     private bool isDrawing = false;
@@ -31,10 +32,11 @@ public class CursorController : MonoBehaviour
     private void drawPoint(int x, int y, int z)
     {
         float s = 1 / (float)scaleFactor;
-        var pixel = Instantiate(pixelPrefab, new Vector3(x * s, y * s, z * s), Quaternion.identity);
+        Vector3 point = new Vector3(x * s, y * s, z * s);
+        var pixel = Instantiate(pixelPrefab, point, Quaternion.identity);
         pixel.transform.localScale = new Vector3(s, s, s);
+        drawingStatusDisplay.GetComponent<TextMeshPro>().text = $"Draw: {toPositionString(point)}";
     }
-    // create 2 arrays, (x, y) and (x, z) and merge them
 
     private IEnumerator drawBresenhamLine(Vector3 begin, Vector3 end) {
         float coroutineInterval = 1f / stepsPerSecond;
@@ -123,6 +125,7 @@ public class CursorController : MonoBehaviour
             }
         }
         drawPoint(x, y, z);
+        resetDrawingStatusText();
         yield return null;
     }
 
@@ -137,7 +140,13 @@ public class CursorController : MonoBehaviour
             begin = point;
         }
     }
+
+    void resetDrawingStatusText()
+    {
+        drawingStatusDisplay.GetComponent<TextMeshPro>().text = "";
+    }
     void Start() {
+        resetDrawingStatusText();
     }
 
     void Update() {
